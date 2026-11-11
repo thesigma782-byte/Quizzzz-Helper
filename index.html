@@ -1,0 +1,687 @@
+-cols-1 sm:grid-cols-2 gap-6 pt-2 border-t border-cardBorder">
+                    <!-- Question Count Slider -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm font-m<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizzHelper - AI-Powered Study Companion</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b132b',
+                        cardBg: '#1c2541',
+                        cardBorder: '#3a506b',
+                        accentBlue: '#48cae4',
+                        accentHover: '#00b4d8',
+                        accentGlow: '#90e0ef'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b132b;
+            color: #f8fafc;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b132b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a506b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #48cae4;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(72, 202, 228, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(72, 202, 228, 0.6); }
+        }
+        .streak-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spinSlow 3s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-[#48cae4] selection:text-[#0b132b]">
+
+    <!-- Top Navigation -->
+    <header class="w-full border-b border-cardBorder bg-[#0b132b]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToSetup()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#48cae4] to-[#3a506b] flex items-center justify-center shadow-lg shadow-[#48cae4]/20">
+                    <i class="fa-solid fa-graduation-cap text-[#0b132b] text-lg font-bold"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-[#90e0ef] to-[#48cae4] bg-clip-text text-transparent">QuizzHelper</span>
+            </div>
+            
+            <!-- Live Header Stats (Streak & Score) -->
+            <div id="headerStats" class="hidden items-center space-x-4">
+                <div class="flex items-center space-x-2 bg-cardBg border border-cardBorder px-3 py-1.5 rounded-full text-sm">
+                    <i class="fa-solid fa-fire text-amber-500 animate-pulse"></i>
+                    <span class="text-slate-400">Streak:</span>
+                    <span id="headerStreakCount" class="font-bold text-white">0</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-cardBg border border-cardBorder px-3 py-1.5 rounded-full text-sm">
+                    <i class="fa-solid fa-star text-[#48cae4]"></i>
+                    <span class="text-slate-400">Score:</span>
+                    <span id="headerScoreCount" class="font-bold text-white">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+
+        <!-- SCREEN 1: SETUP SCREEN -->
+        <section id="setupScreen" class="w-full space-y-6 transition-all duration-300">
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">What are we studying today?</h1>
+                <p class="text-slate-400 text-sm sm:text-base">Enter your lesson topic or notes below, and Gemini AI will generate a tailored quiz for you.</p>
+            </div>
+
+            <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 backdrop-blur-sm">
+                <!-- Lesson Prompt Input -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-slate-300" for="lessonPrompt">
+                        <i class="fa-solid fa-wand-magic-sparkles text-[#48cae4] mr-2"></i>Lesson Prompt or Notes
+                    </label>
+                    <textarea id="lessonPrompt" rows="4" 
+                        class="w-full bg-[#0b132b] border border-cardBorder rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#48cae4] focus:ring-1 focus:ring-[#48cae4] transition-all resize-none text-sm"
+                        placeholder="e.g., Lesson is about Photosynthesis, light-dependent reactions, Calvin cycle, chloroplasts, and chlorophyll..."></textarea>
+                </div>
+
+                <!-- Customization Grid -->
+                <div class="grid gridedium text-slate-300" for="questionCount">
+                                <i class="fa-solid fa-list-ol text-[#48cae4] mr-2"></i>Number of Questions
+                            </label>
+                            <span id="questionCountDisplay" class="bg-[#48cae4]/10 text-[#48cae4] font-semibold px-2.5 py-1 rounded-lg text-sm border border-[#48cae4]/20">5</span>
+                        </div>
+                        <input type="range" id="questionCount" min="2" max="15" value="5" 
+                            class="w-full accent-[#48cae4] bg-[#0b132b] h-2 rounded-lg appearance-none cursor-pointer"
+                            oninput="document.getElementById('questionCountDisplay').innerText = this.value">
+                    </div>
+
+                    <!-- Question Types Selection -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-slate-300">
+                            <i class="fa-solid fa-puzzle-piece text-[#48cae4] mr-2"></i>Question Types
+                        </label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center space-x-2 bg-[#0b132b] border border-cardBorder p-2.5 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                                <input type="checkbox" name="qType" value="multiple-choice" checked class="accent-[#48cae4] w-4 h-4 rounded">
+                                <span class="text-slate-300 font-medium">Multiple Choice</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0b132b] border border-cardBorder p-2.5 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                                <input type="checkbox" name="qType" value="true-false" checked class="accent-[#48cae4] w-4 h-4 rounded">
+                                <span class="text-slate-300 font-medium">True or False</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0b132b] border border-cardBorder p-2.5 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                                <input type="checkbox" name="qType" value="identification" checked class="accent-[#48cae4] w-4 h-4 rounded">
+                                <span class="text-slate-300 font-medium">Identification</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0b132b] border border-cardBorder p-2.5 rounded-xl cursor-pointer hover:border-slate-500 transition-colors">
+                                <input type="checkbox" name="qType" value="enumeration" checked class="accent-[#48cae4] w-4 h-4 rounded">
+                                <span class="text-slate-300 font-medium">Enumeration</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <button onclick="generateQuiz()" class="w-full mt-4 bg-gradient-to-r from-[#3a506b] to-[#48cae4] hover:from-[#2c3e55] hover:to-[#00b4d8] text-[#0b132b] font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-[#48cae4]/20 transition-all transform active:scale-[0.99] flex items-center justify-center space-x-2 text-sm sm:text-base">
+                    <i class="fa-solid fa-bolt text-amber-300"></i>
+                    <span>Generate Quiz with Gemini AI</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 1.5: LOADING SCREEN -->
+        <section id="loadingScreen" class="w-full hidden flex flex-col items-center justify-center py-16 space-y-6 text-center">
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 rounded-full border-4 border-cardBorder"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-[#48cae4] border-t-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fa-solid fa-brain text-[#48cae4] text-2xl animate-pulse"></i>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-2xl font-bold text-white">Gemini is crafting your quiz...</h2>
+                <p class="text-slate-400 text-sm max-w-md mx-auto">Analyzing your lesson prompt and formulating precise questions and answer options.</p>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: QUIZ TAKING SCREEN -->
+        <section id="quizScreen" class="w-full hidden space-y-6">
+            <!-- Quiz Progress & Streak Top Bar -->
+            <div class="flex items-center justify-between bg-cardBg border border-cardBorder px-5 py-3 rounded-2xl shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Question</span>
+                    <span id="currentQuestionNum" class="text-lg font-bold text-[#48cae4]">1</span>
+                    <span class="text-slate-600">/</span>
+                    <span id="totalQuestionNum" class="text-sm font-medium text-slate-400">5</span>
+                </div>
+                <!-- Fire Streak Widget -->
+                <div id="streakBadge" class="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl">
+                    <i class="fa-solid fa-fire text-amber-500 text-base animate-bounce"></i>
+                    <span class="text-xs text-amber-300 font-medium">Streak: <strong id="streakCountVal" class="text-amber-400 text-sm">0</strong></span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-cardBorder h-1.5 rounded-full overflow-hidden">
+                <div id="quizProgressBar" class="bg-[#48cae4] h-full transition-all duration-300 w-0"></div>
+            </div>
+
+            <!-- Question Card Container -->
+            <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 relative overflow-hidden">
+                <!-- Question Type Badge -->
+                <div class="flex items-center justify-between">
+                    <span id="questionTypeBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#48cae4]/10 text-[#48cae4] border border-[#48cae4]/20">
+                        Multiple Choice
+                    </span>
+                    <span id="topicIndicator" class="text-xs text-slate-400 truncate max-w-[220px]"></span>
+                </div>
+
+                <!-- Question Text -->
+                <h2 id="questionText" class="text-lg sm:text-xl font-semibold text-white leading-relaxed">
+                    Loading question...
+                </h2>
+
+                <!-- Dynamic Answers Area -->
+                <div id="answerOptionsContainer" class="space-y-3 pt-2">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="feedbackBanner" class="hidden p-4 rounded-xl text-sm font-medium flex items-center space-x-3 transition-all">
+                    <i id="feedbackIcon" class="fa-solid text-lg"></i>
+                    <div id="feedbackText"></div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-4 flex justify-end">
+                    <button id="submitAnswerBtn" onclick="submitAnswer()" class="bg-[#48cae4] hover:bg-[#00b4d8] text-[#0b132b] font-bold py-3 px-8 rounded-xl shadow-md transition-all text-sm">
+                        Submit Answer
+                    </button>
+                    <button id="nextQuestionBtn" onclick="nextQuestion()" class="hidden bg-[#48cae4] hover:bg-[#00b4d8] text-[#0b132b] font-bold py-3 px-8 rounded-xl shadow-md transition-all text-sm flex items-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: SUMMARY SCREEN -->
+        <section id="summaryScreen" class="w-full hidden space-y-6">
+            <div class="bg-cardBg border border-cardBorder rounded-2xl p-8 shadow-2xl text-center space-y-6">
+                <div class="w-20 h-20 bg-[#48cae4]/10 border border-[#48cae4]/20 rounded-full flex items-center justify-center mx-auto text-[#48cae4] text-3xl shadow-lg">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Quiz Completed!</h2>
+                    <p class="text-slate-400 text-sm">Here is how you performed on your study session.</p>
+                </div>
+
+                <!-- Score Breakdown Grid -->
+                <div class="grid grid-cols-3 gap-4 max-w-md mx-auto py-4">
+                    <div class="bg-[#0b132b] border border-cardBorder p-4 rounded-xl">
+                        <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Score</div>
+                        <div id="finalScore" class="text-xl sm:text-2xl font-bold text-white">0/0</div>
+                    </div>
+                    <div class="bg-[#0b132b] border border-cardBorder p-4 rounded-xl">
+                        <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Accuracy</div>
+                        <div id="finalAccuracy" class="text-xl sm:text-2xl font-bold text-[#48cae4]">0%</div>
+                    </div>
+                    <div class="bg-[#0b132b] border border-cardBorder p-4 rounded-xl">
+                        <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Best Streak</div>
+                        <div id="finalMaxStreak" class="text-xl sm:text-2xl font-bold text-amber-400">0</div>
+                    </div>
+                </div>
+
+                <!-- Restart Button -->
+                <div class="pt-2 flex justify-center space-x-4">
+                    <button onclick="resetToSetup()" class="bg-[#48cae4] hover:bg-[#00b4d8] text-[#0b132b] font-bold py-3 px-8 rounded-xl shadow-lg shadow-[#48cae4]/20 transition-all text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Create Another Quiz</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-cardBorder py-4 text-center text-xs text-slate-500">
+        QuizzHelper &bull; Powered by Gemini AI Study Engine
+    </footer>
+
+    <!-- Notification Message Box Modal -->
+    <div id="msgModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardBg border border-cardBorder rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+            <div id="msgIcon" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl"></div>
+            <h3 id="msgTitle" class="text-lg font-bold text-white">Notice</h3>
+            <p id="msgBody" class="text-sm text-slate-300"></p>
+            <button onclick="closeModal()" class="w-full bg-[#48cae4] hover:bg-[#00b4d8] text-[#0b132b] font-bold py-2.5 rounded-xl text-sm transition-colors">Got it</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic with Gemini API Integration -->
+    <script>
+        // State management
+        let quizState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            isAnswered: false,
+            topic: ""
+        };
+
+        function showMessage(title, body, type = 'info') {
+            const modal = document.getElementById('msgModal');
+            const titleEl = document.getElementById('msgTitle');
+            const bodyEl = document.getElementById('msgBody');
+            const iconEl = document.getElementById('msgIcon');
+
+            titleEl.innerText = title;
+            bodyEl.innerText = body;
+
+            if (type === 'error') {
+                iconEl.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else {
+                iconEl.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-[#48cae4]/10 text-[#48cae4] border border-[#48cae4]/20";
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('msgModal').classList.add('hidden');
+        }
+
+        // Generate Quiz using Gemini API
+        async function generateQuiz() {
+            const promptText = document.getElementById('lessonPrompt').value.trim();
+            const count = parseInt(document.getElementById('questionCount').value);
+            
+            const typeCheckboxes = document.querySelectorAll('input[name="qType"]:checked');
+            const selectedTypes = Array.from(typeCheckboxes).map(cb => cb.value);
+
+            if (!promptText) {
+                showMessage("Input Required", "Please enter a lesson topic or notes so Gemini can generate your quiz.", "error");
+                return;
+            }
+
+            if (selectedTypes.length === 0) {
+                showMessage("Selection Required", "Please select at least one question type.", "error");
+                return;
+            }
+
+            quizState.topic = promptText.length > 30 ? promptText.substring(0, 27) + '...' : promptText;
+
+            // Switch to loading screen
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('loadingScreen').classList.remove('hidden');
+
+            try {
+                const questions = await fetchGeminiQuestions(promptText, count, selectedTypes);
+                if (!questions || questions.length === 0) {
+                    throw new Error("No questions returned from API.");
+                }
+
+                quizState.questions = questions;
+                quizState.currentIndex = 0;
+                quizState.score = 0;
+                quizState.streak = 0;
+                quizState.maxStreak = 0;
+                quizState.isAnswered = false;
+
+                // Switch views to quiz screen
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('quizScreen').classList.remove('hidden');
+                document.getElementById('headerStats').classList.remove('hidden');
+                document.getElementById('headerStats').classList.add('flex');
+
+                loadQuestion();
+            } catch (error) {
+                console.error("Quiz generation error:", error);
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.remove('hidden');
+                showMessage("Generation Error", "Failed to generate quiz with Gemini AI. Please check your prompt or try again.", "error");
+            }
+        }
+
+        // Call Gemini API to get structured JSON quiz questions
+        async function fetchGeminiQuestions(lessonPrompt, count, types) {
+            const systemPrompt = `You are an expert educational AI quiz generator. Create a JSON array of exactly ${count} quiz questions based on the user's lesson prompt.
+The allowed question types are: ${types.join(', ')}.
+Distribute the requested number of questions across these types as evenly as possible.
+
+Return ONLY valid JSON matching this schema:
+[
+  {
+    "type": "multiple-choice", // must be one of: multiple-choice, true-false, identification, enumeration
+    "typeName": "Multiple Choice", // human readable label
+    "question": "Question text here...",
+    "options": ["Option A", "Option B", "Option C", "Option D"], // required ONLY for multiple-choice (4 options)
+    "correctIndex": 0, // number (0 to 3) indicating correct option for multiple-choice
+    "correctAnswer": "Exact answer string", // required for true-false ("True" or "False") or identification (single key term/answer)
+    "correctAnswers": ["item1", "item2"], // required for enumeration (array of valid items)
+    "countNeeded": 2, // required for enumeration (number of items expected)
+    "explanation": "Detailed explanation of the correct answer."
+  }
+]`;
+
+            const userQuery = `Lesson topic / notes: "${lessonPrompt}". Generate ${count} quiz questions now.`;
+            const apiKey = ""; // Canvas runtime provides this automatically
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "type": { "type": "STRING" },
+                                "typeName": { "type": "STRING" },
+                                "question": { "type": "STRING" },
+                                "options": {
+                                    "type": "ARRAY",
+                                    "items": { "type": "STRING" }
+                                },
+                                "correctIndex": { "type": "NUMBER" },
+                                "correctAnswer": { "type": "STRING" },
+                                "correctAnswers": {
+                                    "type": "ARRAY",
+                                    "items": { "type": "STRING" }
+                                },
+                                "countNeeded": { "type": "NUMBER" },
+                                "explanation": { "type": "STRING" }
+                            },
+                            "propertyOrdering": ["type", "typeName", "question", "options", "correctIndex", "correctAnswer", "correctAnswers", "countNeeded", "explanation"]
+                        }
+                    }
+                }
+            };
+
+            // Implement exponential backoff for fetch call
+            let retries = 3;
+            let delay = 1000;
+            let response;
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                }
+                await new Promise(res => setTimeout(res, delay));
+                delay *= 2;
+            }
+
+            if (!response || !response.ok) {
+                throw new Error("API request failed.");
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                const rawJson = candidate.content.parts[0].text;
+                return JSON.parse(rawJson);
+            } else {
+                throw new Error("Invalid API response format.");
+            }
+        }
+
+        function loadQuestion() {
+            quizState.isAnswered = false;
+            const q = quizState.questions[quizState.currentIndex];
+
+            // Update Header & Progress
+            document.getElementById('currentQuestionNum').innerText = quizState.currentIndex + 1;
+            document.getElementById('totalQuestionNum').innerText = quizState.questions.length;
+            document.getElementById('topicIndicator').innerText = quizState.topic;
+            
+            const progressPercent = ((quizState.currentIndex) / quizState.questions.length) * 100;
+            document.getElementById('quizProgressBar').style.width = `${progressPercent}%`;
+
+            // Update Streak Display
+            document.getElementById('streakCountVal').innerText = quizState.streak;
+            document.getElementById('headerStreakCount').innerText = quizState.streak;
+            document.getElementById('headerScoreCount').innerText = quizState.score;
+
+            if (quizState.streak >= 3) {
+                document.getElementById('streakBadge').classList.add('streak-glow', 'border-amber-500/60');
+            } else {
+                document.getElementById('streakBadge').classList.remove('streak-glow', 'border-amber-500/60');
+            }
+
+            // Render Question UI
+            document.getElementById('questionTypeBadge').innerText = q.typeName || q.type;
+            document.getElementById('questionText').innerText = q.question;
+
+            const container = document.getElementById('answerOptionsContainer');
+            container.innerHTML = '';
+
+            if (q.type === 'multiple-choice' && q.options && q.options.length > 0) {
+                q.options.forEach((opt, idx) => {
+                    container.innerHTML += `
+                        <label class="flex items-start space-x-3 bg-[#0b132b] border border-cardBorder p-4 rounded-xl cursor-pointer hover:border-[#48cae4]/50 transition-all group">
+                            <input type="radio" name="mcOption" value="${idx}" class="mt-1 accent-[#48cae4] w-4 h-4">
+                            <span class="text-slate-200 text-sm group-hover:text-white">${opt}</span>
+                        </label>
+                    `;
+                });
+            } else if (q.type === 'true-false') {
+                ['True', 'False'].forEach((val) => {
+                    container.innerHTML += `
+                        <label class="flex items-center space-x-3 bg-[#0b132b] border border-cardBorder p-4 rounded-xl cursor-pointer hover:border-[#48cae4]/50 transition-all group">
+                            <input type="radio" name="tfOption" value="${val}" class="accent-[#48cae4] w-4 h-4">
+                            <span class="text-slate-200 text-sm font-medium group-hover:text-white">${val}</span>
+                        </label>
+                    `;
+                });
+            } else if (q.type === 'identification') {
+                container.innerHTML += `
+                    <div class="space-y-2">
+                        <input type="text" id="identAnswer" placeholder="Type your answer here..." 
+                            class="w-full bg-[#0b132b] border border-cardBorder rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#48cae4] transition-all text-sm">
+                    </div>
+                `;
+            } else if (q.type === 'enumeration') {
+                const countNeeded = q.countNeeded || 2;
+                container.innerHTML += `
+                    <div class="space-y-3">
+                        <p class="text-xs text-slate-400">Provide ${countNeeded} separate answers:</p>
+                        <div class="space-y-2" id="enumInputsContainer">
+                            ${Array.from({length: countNeeded}).map((_, i) => `
+                                <input type="text" data-enum-input="true" placeholder="Item ${i+1}..." 
+                                    class="w-full bg-[#0b132b] border border-cardBorder rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#48cae4] transition-all text-sm">
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Fallback for unexpected format
+                container.innerHTML += `
+                    <div class="space-y-2">
+                        <input type="text" id="identAnswer" placeholder="Type your answer here..." 
+                            class="w-full bg-[#0b132b] border border-cardBorder rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#48cae4] transition-all text-sm">
+                    </div>
+                `;
+            }
+
+            // Reset buttons
+            document.getElementById('feedbackBanner').classList.add('hidden');
+            document.getElementById('submitAnswerBtn').classList.remove('hidden');
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+        }
+
+        function submitAnswer() {
+            if (quizState.isAnswered) return;
+            const q = quizState.questions[quizState.currentIndex];
+            let isCorrect = false;
+
+            if (q.type === 'multiple-choice') {
+                const selected = document.querySelector('input[name="mcOption"]:checked');
+                if (!selected) {
+                    showMessage("Selection Required", "Please select an option before submitting.", "error");
+                    return;
+                }
+                const correctIdx = q.correctIndex !== undefined ? q.correctIndex : 0;
+                if (parseInt(selected.value) === correctIdx) isCorrect = true;
+            } else if (q.type === 'true-false') {
+                const selected = document.querySelector('input[name="tfOption"]:checked');
+                if (!selected) {
+                    showMessage("Selection Required", "Please select True or False.", "error");
+                    return;
+                }
+                const correctAns = q.correctAnswer || 'True';
+                if (selected.value.toLowerCase() === correctAns.toLowerCase()) isCorrect = true;
+            } else if (q.type === 'identification') {
+                const valElem = document.getElementById('identAnswer');
+                const val = valElem ? valElem.value.trim().toLowerCase() : '';
+                if (!val) {
+                    showMessage("Input Required", "Please type an answer before submitting.", "error");
+                    return;
+                }
+                const correctAns = (q.correctAnswer || '').toLowerCase();
+                if (val.includes(correctAns) || correctAns.includes(val) || val === correctAns) {
+                    isCorrect = true;
+                }
+            } else if (q.type === 'enumeration') {
+                const inputs = document.querySelectorAll('input[data-enum-input="true"]');
+                let validCount = 0;
+                const correctList = q.correctAnswers || [];
+                inputs.forEach(inp => {
+                    const val = inp.value.trim().toLowerCase();
+                    if (val && correctList.some(ans => val.includes(ans.toLowerCase()) || ans.toLowerCase().includes(val))) {
+                        validCount++;
+                    }
+                });
+                const countNeeded = q.countNeeded || 2;
+                if (validCount >= Math.min(1, countNeeded)) {
+                    isCorrect = true;
+                }
+            } else {
+                const valElem = document.getElementById('identAnswer');
+                const val = valElem ? valElem.value.trim().toLowerCase() : '';
+                if (val) isCorrect = true;
+            }
+
+            quizState.isAnswered = true;
+
+            // Update stats
+            if (isCorrect) {
+                quizState.score++;
+                quizState.streak++;
+                if (quizState.streak > quizState.maxStreak) {
+                    quizState.maxStreak = quizState.streak;
+                }
+            } else {
+                quizState.streak = 0;
+            }
+
+            // Update Header Live Stats
+            document.getElementById('headerStreakCount').innerText = quizState.streak;
+            document.getElementById('headerScoreCount').innerText = quizState.score;
+
+            // Show Feedback Banner
+            const banner = document.getElementById('feedbackBanner');
+            const icon = document.getElementById('feedbackIcon');
+            const text = document.getElementById('feedbackText');
+
+            banner.classList.remove('hidden');
+            const explanation = q.explanation || "Review the lesson notes for more details.";
+            if (isCorrect) {
+                banner.className = "p-4 rounded-xl text-sm font-medium flex items-center space-x-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                icon.className = "fa-solid fa-circle-check text-lg text-emerald-400";
+                text.innerHTML = `<strong>Correct!</strong> ${explanation}`;
+            } else {
+                banner.className = "p-4 rounded-xl text-sm font-medium flex items-center space-x-3 bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                icon.className = "fa-solid fa-circle-xmark text-lg text-rose-400";
+                text.innerHTML = `<strong>Incorrect.</strong> ${explanation}`;
+            }
+
+            // Toggle buttons
+            document.getElementById('submitAnswerBtn').classList.add('hidden');
+            document.getElementById('nextQuestionBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            quizState.currentIndex++;
+            if (quizState.currentIndex < quizState.questions.length) {
+                loadQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('headerStats').classList.add('hidden');
+            document.getElementById('summaryScreen').classList.remove('hidden');
+
+            const total = quizState.questions.length;
+            const score = quizState.score;
+            const accuracy = total > 0 ? Math.round((score / total) * 100) : 0;
+
+            document.getElementById('finalScore').innerText = `${score}/${total}`;
+            document.getElementById('finalAccuracy').innerText = `${accuracy}%`;
+            document.getElementById('finalMaxStreak').innerText = quizState.maxStreak;
+        }
+
+        function resetToSetup() {
+            document.getElementById('summaryScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('headerStats').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+            document.getElementById('lessonPrompt').value = '';
+        }
+    </script>
+</body>
+</html>
